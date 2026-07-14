@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoadWatch PH — Crowdsourced Road Damage</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=20260708" />
+</head>
+<body>
+  <!-- Main Map View -->
+  <div id="app">
+    <div id="main-map"></div>
+
+    <!-- Top-left branding -->
+    <header class="brand-panel">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <h1>RoadWatch PH</h1>
+        <p>Crowdsourced road damage</p>
+      </div>
+    </header>
+
+    <!-- Top-right actions -->
+    <div class="top-right-actions">
+      <a class="admin-btn" href="admin.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Admin
+      </a>
+      <button class="settings-btn" id="open-settings" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Settings
+      </button>
+    </div>
+
+    <!-- Bottom-left stats & legend -->
+    <aside class="stats-panel" id="stats-panel">
+      <div class="stats-header">
+        <span class="live-label">LIVE MAP</span>
+        <button class="stats-toggle-btn" id="toggle-stats-panel" type="button" aria-expanded="true" aria-label="Collapse map info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+      </div>
+      <div class="stats-panel-body" id="stats-panel-body">
+        <div class="stats-section">
+          <div class="stats-count" id="approved-count">0</div>
+          <span class="stats-sub">approved reports nationwide</span>
+        </div>
+        <hr class="panel-divider" />
+        <ul class="legend-list">
+          <li><span class="dot dot-pending"></span> Pending Review</li>
+          <li><span class="dot dot-pothole"></span> Pothole</li>
+          <li><span class="dot dot-alligator"></span> Alligator Crack</li>
+          <li><span class="dot dot-longitudinal"></span> Longitudinal Crack</li>
+          <li><span class="dot dot-transverse"></span> Transverse Crack</li>
+          <li><span class="dot dot-intact"></span> Intact Road</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Bottom-right CTA -->
+    <button class="report-cta" id="open-report" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Report Damage
+    </button>
+  </div>
+
+  <!-- Report Modal -->
+  <div class="modal-overlay hidden" id="report-modal">
+    <div class="modal-card report-modal">
+      <div class="modal-header">
+        <div>
+          <h2>Report Road Damage</h2>
+          <p class="step-label" id="report-step-label">Step 1 of 4</p>
+        </div>
+        <button class="close-btn" id="close-report" type="button" aria-label="Close">&times;</button>
+      </div>
+
+      <!-- Step 1: Upload -->
+      <div class="modal-body" id="report-step-1">
+        <label class="upload-zone" id="upload-zone" for="photo-input">
+          <input type="file" id="photo-input" accept="image/jpeg,image/png,image/jpg" hidden />
+          <div class="upload-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p class="upload-title">Upload a photo of the damage</p>
+          <p class="upload-hint">Drag &amp; drop, or tap to use your camera</p>
+        </label>
+        <p class="upload-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          JPG, PNG up to ~10MB. Geolocation will be requested next.
+        </p>
+        <p class="upload-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Stand a few feet back so some road is visible around the damage — close-up shots make crack types harder to tell apart.
+        </p>
+
+        <div class="reporter-info">
+          <div class="reporter-info-label">
+            <span>Your info <span class="reporter-info-optional">(optional)</span></span>
+          </div>
+          <div class="form-field">
+            <label>Full name<input type="text" id="reporter-name" placeholder="Juan Dela Cruz" autocomplete="name" /></label>
+          </div>
+          <div class="form-field">
+            <label>Email<input type="email" id="reporter-email" placeholder="juan@email.com" autocomplete="email" /></label>
+          </div>
+          <p class="upload-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Helps moderators verify the report is genuine. Not shown publicly on the map.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2: Location -->
+      <div class="modal-body hidden" id="report-step-2">
+        <button class="back-btn" id="back-to-upload" type="button">&larr; Back</button>
+        <img class="preview-image" id="preview-image" alt="Damage preview" />
+        <div class="location-header">
+          <span class="location-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Confirm location
+          </span>
+          <button class="gps-btn" id="use-gps" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+            Use my GPS
+          </button>
+        </div>
+        <div id="location-map" class="location-map"></div>
+        <p class="coords" id="pin-coords">Pin: 14.52914, 121.07134</p>
+        <button class="primary-btn" id="to-classification" type="button">Continue to classification</button>
+      </div>
+
+      <!-- Step 3: Classification -->
+      <div class="modal-body hidden" id="report-step-3">
+        <button class="back-btn" id="back-to-location" type="button">&larr; Back</button>
+        <img class="preview-image" id="preview-image-2" alt="Damage preview" />
+        <div class="classifying" id="classifying-state">
+          <div class="spinner"></div>
+          <p>Analyzing damage type…</p>
+        </div>
+        <div class="classification-result hidden" id="classification-result">
+          <div class="result-box">
+            <div class="result-header">
+              <span class="result-label">RESULT</span>
+              <span class="result-conf" id="result-confidence">79.2% confidence</span>
+            </div>
+            <p class="result-type" id="result-type">Pothole</p>
+            <div class="prediction-heading">Also considered</div>
+            <div class="top-predictions" id="top-predictions"></div>
+          </div>
+
+          <div class="reporter-info">
+            <div class="reporter-info-label">
+              <span>Extra details <span class="reporter-info-optional">(optional)</span></span>
+            </div>
+            <div class="form-field">
+              <label>How long has this been here?
+                <select id="report-duration">
+                  <option value="">Not sure</option>
+                  <option value="just_noticed">Just noticed it</option>
+                  <option value="few_days">A few days</option>
+                  <option value="few_weeks">A few weeks</option>
+                  <option value="over_month">Over a month</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-field">
+              <label>How severe does it look?
+                <select id="report-severity">
+                  <option value="">Not sure</option>
+                  <option value="low">Low &mdash; minor, cosmetic</option>
+                  <option value="moderate">Moderate &mdash; noticeable hazard</option>
+                  <option value="severe">Severe &mdash; real safety risk</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <button class="primary-btn" id="submit-report" type="button">Submit report</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Success -->
+      <div class="modal-body hidden" id="report-step-4">
+        <div class="success-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 class="success-title">Report submitted</h3>
+        <p class="success-sub">Now on the map as pending review (grey pin) while a moderator verifies it.</p>
+        <div class="result-box">
+          <div class="result-header">
+            <span class="result-label">RESULT</span>
+            <span class="result-conf" id="final-confidence">79.2% confidence</span>
+          </div>
+          <p class="result-type" id="final-type">Pothole</p>
+        </div>
+        <button class="primary-btn" id="done-report" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal-card settings-modal">
+      <div class="modal-header settings-header">
+        <h2>Settings</h2>
+        <button class="close-btn" id="close-settings" type="button" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body settings-body">
+        <div class="info-card">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <p>Road damage reports are crowdsourced. New reports appear on the map immediately as <strong>pending review</strong> (grey pin) while a moderator verifies them, then become fully visible once approved, and can have repair teams dispatched as needed. Currently tracking <strong id="info-pending">0</strong> pending, <strong id="info-total">0</strong> approved reports, <strong id="info-dispatched">0</strong> with a team dispatched, and <strong id="info-resolved">0</strong> resolved.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js?v=20260711"></script>
+  <script src="js/constants.js?v=20260708"></script>
+  <script src="js/store.js?v=20260711"></script>
+  <script src="js/map.js?v=20260708"></script>
+  <script src="js/app.js?v=20260708"></script>
+</body>
+</html>

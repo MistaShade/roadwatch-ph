@@ -48,6 +48,6 @@ def classify():
 
 
 if __name__ == "__main__":
-    print("RoadWatch PH prediction API on http://localhost:5000")
+    print("RoadWatch PH prediction API on http://localhost:7860")
     print("Endpoints: GET /api/health  POST /api/classify")
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=7860, debug=False)

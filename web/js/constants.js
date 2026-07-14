@@ -8,7 +8,7 @@ var DAMAGE_TYPES = {
 };
 
 var TYPE_KEYS = Object.keys(DAMAGE_TYPES);
-var API_BASE = 'http://127.0.0.1:5000';
+var API_BASE = 'https://roadwatch-api.containers.snapdeploy.app';
 
 /** Severity levels a reporter can (optionally) select. */
 var SEVERITY_LEVELS = {

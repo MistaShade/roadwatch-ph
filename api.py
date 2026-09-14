@@ -1,5 +1,3 @@
-"""Flask API serving the trained road damage classifier to the web UI."""
-
 from __future__ import annotations
 
 import tempfile

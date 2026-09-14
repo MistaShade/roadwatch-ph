@@ -1,11 +1,4 @@
-"""
-Quick utility: print the exact class distribution used in training,
-without running any training. Just calls the same sample-building logic
-train_model.py / finetune_vgg16.py use internally.
 
-Usage (match whatever settings you actually trained with):
-    python print_class_distribution.py --max-samples 15000 --max-per-class 3500
-"""
 
 from __future__ import annotations
 

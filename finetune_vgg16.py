@@ -1,28 +1,5 @@
-"""
-Fine-tune VGG16 end-to-end for road damage classification.
-
-This REPLACES the frozen-features + SVM approach in train_model.py, which
-plateaued around 0.51 accuracy and couldn't reliably separate
-longitudinal_crack from transverse_crack (a hand-crafted orientation
-feature didn't fix it either -- see project notes). The hope is that a
-model that actually learns from your images, instead of relying on generic
-frozen ImageNet features, can pick up contextual cues a hand-crafted
-feature can't.
-
-Reuses the (already bug-fixed) labeling/sampling logic from train_model.py
-so there's a single source of truth for how images get labeled.
-
-IMPORTANT -- this runs on CPU and will be slow. Recommended workflow:
-
-1. Smoke test first (a few minutes) to confirm everything works:
-   python finetune_vgg16.py --smoke-test
-
-2. Then kick off the real run. Expect roughly 10-30+ minutes PER EPOCH
-   depending on your machine, so a 6-8 epoch run could take a few hours.
-   A checkpoint is saved after every epoch (not just at the end), so you
-   can stop anytime (Ctrl+C) and still have the best-so-far model saved:
-   python finetune_vgg16.py --epochs 8
-"""
+#Reuses some stuff (already bug-fixed) labeling/sampling logic from train_model.py
+#so there's a single source of truth for how images get labeled.
 
 from __future__ import annotations
 

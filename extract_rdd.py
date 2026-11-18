@@ -1,8 +1,3 @@
-"""
-Extract train images + XML annotations for selected RDD2022 countries
-from the nested archives inside RDD2022.zip.
-"""
-
 from __future__ import annotations
 
 import io
